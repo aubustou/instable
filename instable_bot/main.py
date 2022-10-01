@@ -47,7 +47,7 @@ prompt: "{metadata["prompt"]}"
 #music #{metadata["track_artist"].replace(" ", "").lower()} #lyrics"""
 
 
-def upload_image(client: Client, image_path: Path, caption: str):
+def upload_image(client: Client, image_path: Path, caption: str, dump_folder: Path):
     jpg_image_path = image_path.with_suffix(".jpg")
     if not jpg_image_path.exists():
         image = Image.open(image_path)
@@ -55,6 +55,7 @@ def upload_image(client: Client, image_path: Path, caption: str):
 
     logging.info(f"Uploading {image_path} with caption {caption}")
     client.photo_upload(jpg_image_path, caption)
+    jpg_image_path.rename(dump_folder / jpg_image_path.name)
 
 
 def main():
@@ -80,9 +81,11 @@ def main():
 
     already_uploaded_folder = IMAGE_PATH / "already_uploaded"
     already_uploaded_folder.mkdir(exist_ok=True)
+    jpg_folder = IMAGE_PATH / "jpg"
+    jpg_folder.mkdir(exist_ok=True)
 
     image_path = random.choice(list(IMAGE_PATH.glob("*.png")))
-    upload_image(cl, image_path, generate_caption(image_path))
+    upload_image(cl, image_path, generate_caption(image_path), jpg_folder)
     image_path.rename(already_uploaded_folder / image_path.name)
 
 
