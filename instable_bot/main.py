@@ -76,9 +76,10 @@ def main():
         logging.critical("Please set INSTAGRAM_IMAGE_PATH environment variable")
         sys.exit(2)
 
-    cl = Client()
+    cl: Client | None = None
     try:
         while True:
+            cl = Client()
             session_dump_file = Path("session.json")
             if session_dump_file.exists():
                 cl.load_settings(session_dump_file)
@@ -104,7 +105,8 @@ def main():
             logging.info("Waiting %.1f hours", waiting_time / 3600)
             time.sleep(waiting_time)
     except KeyboardInterrupt:
-        cl.logout()
+        if cl:
+            cl.logout()
         logging.info("exiting")
         sys.exit(0)
 
